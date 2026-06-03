@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: lsms
+
+  # 기본값: H2 인메모리 (개발용)
+  datasource:
+    url: jdbc:h2:mem:lsmsdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # MySQL로 전환 시 아래 주석 해제 후 H2 설정 주석 처리
+  # datasource:
+  #   url: jdbc:mysql://localhost:3306/lsms?useSSL=false&serverTimezone=Asia/Seoul
+  #   driver-class-name: com.mysql.cj.jdbc.Driver
+  #   username: root
+  #   password: your_password
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: update
+
+server:
+  port: 8080
+
+# JWT (팀 공통 — 수정하지 말 것)
+# - 로그인 API에서 JwtUtil.generateToken(userId, role)로 토큰 발급
+# - 이후 요청: Authorization: Bearer {토큰}
+# - 컨트롤러: request.getAttribute("loginUserId"), request.getAttribute("loginUserRole")
+jwt:
+  secret: lsms-secret-key-for-lab-safety-management-system-2026-team-project
+  expiration: 86400000   # 24시간 (ms)
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
