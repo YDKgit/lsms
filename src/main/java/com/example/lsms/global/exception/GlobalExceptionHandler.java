@@ -4,6 +4,8 @@ import com.example.lsms.global.common.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -27,6 +29,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(CommonResponse.fail(message));
+    }
+
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<CommonResponse<String>> handleAccessDenied(AccessDeniedException e) {
+        return ResponseEntity
+                .status(ErrorCode.FORBIDDEN.getStatus())
+                .body(CommonResponse.fail(ErrorCode.FORBIDDEN.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<CommonResponse<String>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        return ResponseEntity
+                .badRequest()
+                .body(CommonResponse.fail(ErrorCode.INVALID_INPUT.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
