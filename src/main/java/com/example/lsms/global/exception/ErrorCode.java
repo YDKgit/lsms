@@ -12,6 +12,10 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "리소스를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다."),
+    FILE_STORAGE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장소 생성에 실패했습니다."),
+    INVALID_FILE_PATH(HttpStatus.BAD_REQUEST, "잘못된 파일 경로입니다."),
+    FILE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 생성에 실패했습니다."),
 
     // 서브시스템별 조회 실패 (404 통일)
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 사용자가 없습니다."),
