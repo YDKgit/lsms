@@ -2,11 +2,12 @@ package com.example.lsms.auth.dto;
 
 import com.example.lsms.user.domain.UserRole;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class AuthDto {
 
     public record LoginRequest(
-            @NotBlank String userId,
+            @NotNull Long userId,
             @NotBlank String password
     ) {
     }

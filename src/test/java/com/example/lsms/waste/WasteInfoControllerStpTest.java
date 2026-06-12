@@ -66,7 +66,7 @@ public class WasteInfoControllerStpTest {
         }
     }
 
-    private String login(String userId) throws Exception {
+    private String login(Long userId) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(
@@ -94,7 +94,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-411 폐기물 정상 등록 확인")
     void createWaste_success() throws Exception {
-        String token = login("researcher");
+        String token = login(2L);
         Long labId = existingLabId();
 
         mockMvc.perform(post("/api/wastes")
@@ -118,7 +118,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-412 필수 입력값 누락 시 등록 실패 확인")
     void createWaste_blankWasteName_fail() throws Exception {
-        String token = login("researcher");
+        String token = login(2L);
         Long labId = existingLabId();
 
         mockMvc.perform(post("/api/wastes")
@@ -138,7 +138,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-413 존재하지 않는 폐기물 종류 입력 시 등록 실패 확인")
     void createWaste_wrongWasteType_fail() throws Exception {
-        String token = login("researcher");
+        String token = login(2L);
         Long labId = existingLabId();
 
         mockMvc.perform(post("/api/wastes")
@@ -158,7 +158,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-414 존재하지 않는 연구실 입력 시 등록 실패 확인")
     void createWaste_wrongLab_fail() throws Exception {
-        String token = login("researcher");
+        String token = login(2L);
 
         mockMvc.perform(post("/api/wastes")
                         .header("Authorization", "Bearer " + token)
@@ -177,7 +177,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-421 폐기물 목록 정상 조회 확인")
     void getWasteList_success() throws Exception {
-        String token = login("researcher");
+        String token = login(2L);
 
         mockMvc.perform(get("/api/wastes")
                         .header("Authorization", "Bearer " + token))
@@ -189,7 +189,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-422 검색 조건으로 폐기물 목록 조회 확인")
     void searchWasteList_success() throws Exception {
-        String token = login("researcher");
+        String token = login(2L);
         Long labId = existingLabId();
 
         mockMvc.perform(get("/api/wastes")
@@ -208,7 +208,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-423 잘못된 검색 조건 입력 시 조회 실패 확인")
     void searchWasteList_wrongStatus_fail() throws Exception {
-        String token = login("researcher");
+        String token = login(2L);
 
         mockMvc.perform(get("/api/wastes")
                         .header("Authorization", "Bearer " + token)
@@ -221,7 +221,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-424 폐기물 상세 정보 정상 조회 확인")
     void getWasteDetail_success() throws Exception {
-        String token = login("researcher");
+        String token = login(2L));
         Long wasteId = existingWasteId();
 
         mockMvc.perform(get("/api/wastes/{wasteId}", wasteId)
@@ -234,7 +234,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-425 존재하지 않거나 삭제된 폐기물 상세 조회 실패 확인")
     void getWasteDetail_notFound_fail() throws Exception {
-        String token = login("researcher");
+        String token = login(2L);
 
         mockMvc.perform(get("/api/wastes/{wasteId}", 99999999L)
                         .header("Authorization", "Bearer " + token))
@@ -246,7 +246,7 @@ public class WasteInfoControllerStpTest {
     @Test
     @DisplayName("UTC-WASTE-426 권한 없는 사용자 폐기물 조회 차단 확인")
     void getWasteList_forbidden_fail() throws Exception {
-        String token = login("noauth");
+        String token = login(99L);
 
         mockMvc.perform(get("/api/wastes")
                         .header("Authorization", "Bearer " + token))
