@@ -21,7 +21,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public AuthDto.LoginResponse login(AuthDto.LoginRequest request) {
-        User user = userRepository.findById(request.userId())
+        User user = userRepository.findByUserId(request.userId())
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {

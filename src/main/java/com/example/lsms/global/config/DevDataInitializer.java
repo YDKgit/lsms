@@ -39,7 +39,6 @@ public class DevDataInitializer implements CommandLineRunner {
         }
 
         User admin = userRepository.save(User.builder()
-                .id(1L)
                 .userId("admin")
                 .password(passwordEncoder.encode("1"))
                 .name("시스템관리자")
@@ -49,7 +48,6 @@ public class DevDataInitializer implements CommandLineRunner {
                 .build());
 
         User researcher = userRepository.save(User.builder()
-                .id(2L)
                 .userId("researcher")
                 .password(passwordEncoder.encode("1"))
                 .name("연구원")
