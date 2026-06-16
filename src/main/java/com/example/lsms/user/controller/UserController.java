@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('USER_MANAGER') or hasRole('SYSTEM_ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CommonResponse<List<UserResponse>>> getUsers(
             @RequestParam(required = false) String department) {
         List<UserResponse> users = userService.getUsers(department);
