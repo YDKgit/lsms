@@ -22,7 +22,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    @PreAuthorize("hasRole('SYSTEM_ADMIN')")
+    @PreAuthorize("hasRole('USER_MANAGER') or hasRole('SYSTEM_ADMIN')")
     public ResponseEntity<CommonResponse<UserResponse>> register(
             @Valid @RequestBody UserRegisterRequest request) {
         UserResponse response = userService.register(request);
@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('SYSTEM_ADMIN') or hasRole('SAFETY_MANAGEMENT_TEAM')")
+    @PreAuthorize("hasRole('USER_MANAGER') or hasRole('SYSTEM_ADMIN')")
     public ResponseEntity<CommonResponse<List<UserResponse>>> getUsers(
             @RequestParam(required = false) String department) {
         List<UserResponse> users = userService.getUsers(department);

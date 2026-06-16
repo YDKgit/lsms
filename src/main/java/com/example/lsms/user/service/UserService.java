@@ -56,7 +56,7 @@ public class UserService {
     }
 
     public void validateSelfOrAdmin(Long loginUserId, String loginUserRole, Long targetUserId) {
-        if (!loginUserId.equals(targetUserId) && !UserRole.SYSTEM_ADMIN.name().equals(loginUserRole)) {
+        if (!loginUserId.equals(targetUserId) && !UserRole.USER_MANAGER.name().equals(loginUserRole) && !UserRole.SYSTEM_ADMIN.name().equals(loginUserRole)) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
     }
