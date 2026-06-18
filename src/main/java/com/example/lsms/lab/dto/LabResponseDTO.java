@@ -10,6 +10,7 @@ public record LabResponseDTO(
         String labName,
         String deptName,
         String managerName,
+        String managerDepartment,
         String buildingLocation,
         String labType,
         String isInspectionTarget,
@@ -62,6 +63,9 @@ public record LabResponseDTO(
     }
 
     public record FloorPlanUploaded(String filePath) {
+    }
+
+    public record LayoutPlanUploaded(String filePath) {
     }
 
     public record Dashboard(

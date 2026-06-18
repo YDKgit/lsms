@@ -23,7 +23,7 @@ public class ChecklistController {
 
     @Operation(summary = "체크리스트 생성")
     @PostMapping
-    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN', 'LAB_SAFETY_MANAGER', 'SAFETY_MANAGEMENT_TEAM')")
+    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN', 'SAFETY_MANAGEMENT_TEAM')")
     public ResponseEntity<ChecklistResponseDTO> createItem(@Valid @RequestBody ChecklistRequestDTO request) {
         ChecklistResponseDTO response = checklistService.registerItem(request);
         return ResponseEntity.ok(response);
@@ -31,7 +31,7 @@ public class ChecklistController {
 
     @Operation(summary = "사용 중인 체크리스트 조회")
     @GetMapping
-    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN', 'LAB_SAFETY_MANAGER', 'LAB_MANAGER', 'SAFETY_MANAGEMENT_TEAM')")
+    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN', 'LAB_SAFETY_MANAGER', 'SAFETY_MANAGEMENT_TEAM')")
     public ResponseEntity<List<ChecklistResponseDTO>> getAllActiveItems() {
         List<ChecklistResponseDTO> checklist = checklistService.getActiveChecklist();
         return ResponseEntity.ok(checklist);

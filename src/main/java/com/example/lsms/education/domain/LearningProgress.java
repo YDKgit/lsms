@@ -18,8 +18,8 @@ public class LearningProgress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String userId;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     private int lastViewedPoint;
 
@@ -36,6 +36,11 @@ public class LearningProgress {
         this.lastViewedPoint = currentPoint;
 
         int requiredTime = this.eduContent.getRequiredTime();
+        if (requiredTime <= 0) {
+            this.learningRate = 100;
+            this.isCompleted = true;
+            return;
+        }
         this.learningRate = Math.min(100, (int) ((double) currentPoint / requiredTime * 100));
 
         if (this.learningRate >= 100) {

@@ -53,12 +53,15 @@ public class InspectionService {
 
     @Transactional
     public Long saveInspection(InspectionRequestDTO dto, String userRole) {
+        if (dto.getLabID() == null || dto.getInspectorID() == null) {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
         LabInfo lab = labRepository.findById(dto.getLabID())
                 .orElseThrow(() -> new CustomException(ErrorCode.LAB_NOT_FOUND));
         User inspector = userRepository.findById(dto.getInspectorID())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if ("ROLE_LAB_SAFETY_MANAGER".equals(userRole) &&
+        if ("LAB_SAFETY_MANAGER".equals(userRole) &&
                 dto.getInspectionType() != InspectionType.DAILY) {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
@@ -132,25 +135,16 @@ public class InspectionService {
         List<Inspection> inspections;
 
         if ("SYSTEM_ADMIN".equals(role) || "SAFETY_MANAGEMENT_TEAM".equals(role)) {
-            // 관리자는 시스템 전체 점검 내역 조회
             inspections = inspectionRepository.findAll();
         } else {
-            // 일반 책임자 및 담당자는 본인이 속하거나 담당하는 연구실의 점검 내역만 조회
             inspections = inspectionRepository.findInspectionsByUserId(userId);
         }
 
         return inspections.stream()
-                .map(inspection -> {
-                    String labName = inspection.getLab().getLabName();
-                    String inspectorName = inspection.getInspector().getName();
-
-                    return InspectionResponseDTO.builder()
-                            .inspectionID(inspection.getInspectionId())
-                            .labName(labName)
-                            .inspectorName(inspectorName)
-                            .inspectionDate(inspection.getInspectionDate())
-                            .build();
-                })
+                .map(inspection -> toSummaryDto(
+                        inspection,
+                        inspection.getLab().getLabName(),
+                        inspection.getInspector().getName()))
                 .collect(Collectors.toList());
     }
 
@@ -165,14 +159,54 @@ public class InspectionService {
             inspection.updateReadDateTime();
         }
 
-        String labName = inspection.getLab().getLabName();
-        String inspectorName = inspection.getInspector().getName();
+        return toDetailDto(inspection);
+    }
+
+    private InspectionResponseDTO toSummaryDto(Inspection inspection, String labName, String inspectorName) {
+        List<InspectionDetailResponseDTO> details = inspection.getDetailList().stream()
+                .map(detail -> InspectionDetailResponseDTO.builder()
+                        .detailId(detail.getDetailId())
+                        .issueCategory(detail.getIssueCategory())
+                        .problemDescribe(detail.getProblemDescribe())
+                        .attachedFile(detail.getAttachedFile())
+                        .actionResult(detail.getActionResult())
+                        .actionDate(detail.getActionDate())
+                        .build())
+                .collect(Collectors.toList());
 
         return InspectionResponseDTO.builder()
                 .inspectionID(inspection.getInspectionId())
                 .labName(labName)
                 .inspectorName(inspectorName)
                 .inspectionDate(inspection.getInspectionDate())
+                .inspectionType(inspection.getInspectionType())
+                .inspectionGrade(inspection.getInspectionGrade())
+                .detailList(details)
+                .build();
+    }
+
+    private InspectionResponseDTO toDetailDto(Inspection inspection) {
+        List<InspectionDetailResponseDTO> details = inspection.getDetailList().stream()
+                .map(detail -> InspectionDetailResponseDTO.builder()
+                        .detailId(detail.getDetailId())
+                        .issueCategory(detail.getIssueCategory())
+                        .problemDescribe(detail.getProblemDescribe())
+                        .attachedFile(detail.getAttachedFile())
+                        .actionResult(detail.getActionResult())
+                        .actionDate(detail.getActionDate())
+                        .build())
+                .collect(Collectors.toList());
+
+        return InspectionResponseDTO.builder()
+                .inspectionID(inspection.getInspectionId())
+                .labName(inspection.getLab().getLabName())
+                .inspectorName(inspection.getInspector().getName())
+                .inspectionDate(inspection.getInspectionDate())
+                .inspectionType(inspection.getInspectionType())
+                .inspectionMethod(inspection.getInspectionMethod())
+                .inspectionGrade(inspection.getInspectionGrade())
+                .readDateTime(inspection.getReadDateTime())
+                .detailList(details)
                 .build();
     }
 
@@ -211,20 +245,21 @@ public class InspectionService {
 
             // 데이터 생성
             int rowNum = 1;
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            DateTimeFormatter dateFormatter     = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
             for (InspectionDetail detail : inspection.getDetailList()) {
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(inspection.getLab().getLabName());
                 row.createCell(1).setCellValue(inspection.getLab().getManager().getName());
                 row.createCell(2).setCellValue(inspection.getInspector().getName());
-                row.createCell(3).setCellValue(inspection.getInspectionDate().format(formatter));
+                row.createCell(3).setCellValue(inspection.getInspectionDate().format(dateFormatter));
                 row.createCell(4).setCellValue(inspection.getInspectionGrade() != null ? inspection.getInspectionGrade() : 0.0);
                 row.createCell(5).setCellValue(detail.getProblemDescribe());
                 row.createCell(6).setCellValue(detail.getActionResult() != null ? detail.getActionResult() : "미조치");
-                row.createCell(7).setCellValue(detail.getActionDate() != null ? detail.getActionDate().format(formatter) : "");
+                row.createCell(7).setCellValue(detail.getActionDate() != null ? detail.getActionDate().format(dateTimeFormatter) : "");
                 row.createCell(8).setCellValue(
-                        inspection.getReadDateTime() != null ? inspection.getReadDateTime().format(formatter) : "미확인"
+                        inspection.getReadDateTime() != null ? inspection.getReadDateTime().format(dateTimeFormatter) : "미확인"
                 );
             }
 
@@ -255,7 +290,7 @@ public class InspectionService {
             }
         } else {
             // 일반 사용자는 자신이 속한 연구실의 점검 내역만 조회
-            List<LabUserMapping> mappings = labUserMappingRepository.findByUserId(userId);
+            List<LabUserMapping> mappings = labUserMappingRepository.findByUser_Id(userId);
             if (mappings.isEmpty()) {
                 return List.of(); // 속한 연구실이 없으면 빈 리스트 반환
             }

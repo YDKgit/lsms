@@ -11,6 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,13 +68,18 @@ public class InspectionController {
     @Operation(summary = "점검 내역 다운로드")
     @GetMapping("/{inspectionId}/download")
     @PreAuthorize("hasAnyRole('SYSTEM_ADMIN', 'LAB_MANAGER', 'LAB_SAFETY_MANAGER', 'SAFETY_MANAGEMENT_TEAM')")
-    public CommonResponse<File> requestDownload(@PathVariable Long inspectionId) {
-        return CommonResponse.ok(inspectionService.createDownloadFile(inspectionId));
+    public ResponseEntity<Resource> requestDownload(@PathVariable Long inspectionId) {
+        File file = inspectionService.createDownloadFile(inspectionId);
+        Resource resource = new FileSystemResource(file);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"inspection_report.xlsx\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     @Operation(summary = "월별 점검 달력 조회")
     @GetMapping("/calendar")
-    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN', 'LAB_MANAGER', 'LAB_SAFETY_MANAGER', 'SAFETY_MANAGEMENT_TEAM')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<CalendarResponseDTO>> getMonthlyCalendar(
             @Valid @ModelAttribute CalendarRequestDTO request,
             @RequestAttribute("loginUserId") Long userId,

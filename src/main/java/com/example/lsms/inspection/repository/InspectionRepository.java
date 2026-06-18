@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface InspectionRepository extends JpaRepository<Inspection, Long> {
+
     @Modifying(clearAutomatically = true)
     @Query("UPDATE InspectionDetail d " +
             "SET d.actionResult = :status, d.actionDate = CURRENT_TIMESTAMP " +

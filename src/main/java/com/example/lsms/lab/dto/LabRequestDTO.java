@@ -8,7 +8,6 @@ import java.util.List;
 
 public record LabRequestDTO(
         @NotBlank String labName,
-        Long deptId,
         @NotNull Long managerId,
         @NotBlank String buildingLocation,
         String labType,
@@ -24,7 +23,7 @@ public record LabRequestDTO(
 ) {
     public MasterCreate toMasterCreate() {
         return new MasterCreate(
-                labName, deptId, managerId, buildingLocation,
+                labName, managerId, buildingLocation,
                 labType, isInspectionTarget, contact, grade,
                 signImagePath, photoImagePath, memberUserIds
         );
@@ -32,7 +31,6 @@ public record LabRequestDTO(
 
     public record MasterCreate(
             @NotBlank String labName,
-            Long deptId,
             @NotNull Long managerId,
             @NotBlank String buildingLocation,
             String labType,
