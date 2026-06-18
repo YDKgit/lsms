@@ -12,9 +12,6 @@ import java.util.Optional;
 @Repository
 public interface LabRepository extends JpaRepository<LabInfo, Long> {
 
-    @Override
-    LabInfo save(LabInfo entity);
-
     @Query("SELECT l FROM LabInfo l LEFT JOIN FETCH l.manager WHERE l.labId = :labId")
     Optional<LabInfo> findByLabId(@Param("labId") Long labId);
 
@@ -22,4 +19,6 @@ public interface LabRepository extends JpaRepository<LabInfo, Long> {
     List<LabInfo> findAllLabs();
 
     boolean existsByLocation(String location);
+
+    boolean existsByLabName(String labName);
 }

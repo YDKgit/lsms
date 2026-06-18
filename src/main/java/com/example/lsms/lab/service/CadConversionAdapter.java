@@ -39,10 +39,33 @@ public class CadConversionAdapter implements DrawingConverter {
             dxfFile.transferTo(saved);
             Files.copy(saved, pngPath);
 
-            return pngPath.toString().replace("\\", "/");
+            return toPublicUrl(pngPath);
         } catch (IOException e) {
             log.error("Failed to convert/store drawing file for labId={}", labId, e);
             throw new IllegalStateException("도면 파일 처리에 실패했습니다.");
         }
+    }
+
+    @Override
+    public String storeLayoutPlan(MultipartFile file, Long labId) {
+        try {
+            Path layoutDir = uploadRoot.resolve(String.valueOf(labId)).resolve("layout");
+            Files.createDirectories(layoutDir);
+            String original = file.getOriginalFilename();
+            String savedName = original != null ? original : "layout-plan.png";
+            Path saved = layoutDir.resolve(savedName);
+            file.transferTo(saved);
+            return toPublicUrl(saved);
+        } catch (IOException e) {
+            log.error("Failed to store layout plan for labId={}", labId, e);
+            throw new IllegalStateException("배치도 파일 처리에 실패했습니다.");
+        }
+    }
+
+    private String toPublicUrl(Path savedFile) {
+        Path uploadsRoot = uploadRoot.toAbsolutePath().normalize().getParent();
+        Path absoluteSaved = savedFile.toAbsolutePath().normalize();
+        String relative = uploadsRoot.relativize(absoluteSaved).toString().replace("\\", "/");
+        return "/uploads/" + relative;
     }
 }

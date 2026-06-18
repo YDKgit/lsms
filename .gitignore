@@ -19,6 +19,29 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# virtual machine crash logs
 hs_err_pid*
 replay_pid*
+
+# Gradle build output
+build/
+.gradle/
+out/
+
+# IDE
+.idea/
+*.iml
+
+# 업로드 파일 (이미지, 도면 등)
+uploads/
+
+# 영상 / 이미지 / 정적 파일
+videos/
+pictures/
+src/main/resources/static/
+
+# 문서 (로컬용)
+docs/
+
+# macOS
+.DS_Store

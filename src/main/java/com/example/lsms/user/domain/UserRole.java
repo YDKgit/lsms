@@ -1,10 +1,8 @@
 package com.example.lsms.user.domain;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public enum UserRole {
 
     USER_MANAGER("User Manager"),                   //사용자관리자
@@ -17,14 +15,8 @@ public enum UserRole {
     RESEARCHER("Researcher");                       //연구원
 
     private final String label;
+
+    UserRole(String label) {
+        this.label = label;
+    }
 }
-
-
-
-
-
-
-
-
-
-

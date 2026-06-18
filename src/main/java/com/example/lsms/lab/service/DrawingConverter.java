@@ -5,4 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface DrawingConverter {
 
     String convertDxfToPng(MultipartFile dxfFile, Long labId);
+
+    String storeLayoutPlan(MultipartFile file, Long labId);
 }

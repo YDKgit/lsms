@@ -9,6 +9,7 @@ import com.example.lsms.lab.dto.LabResponseDTO;
 import com.example.lsms.lab.repository.LabRepository;
 import com.example.lsms.lab.repository.LabUserMappingRepository;
 import com.example.lsms.user.domain.User;
+import com.example.lsms.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +33,6 @@ public class LabMasterService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         LabInfo lab = LabInfo.builder()
-                .deptId(request.deptId())
                 .manager(manager)
                 .labName(request.labName())
                 .location(request.buildingLocation())
@@ -45,6 +45,13 @@ public class LabMasterService {
                 .build();
 
         LabInfo saved = labRepository.save(lab);
+
+        // 책임자를 LabUserMapping에 자동 등록 (point 조회 필터링 기준)
+        labUserMappingRepository.save(LabUserMapping.builder()
+                .lab(saved)
+                .user(manager)
+                .build());
+
         mapLabUsers(saved, request.memberUserIds());
         return new LabResponseDTO.Created(saved.getLabId());
     }
@@ -72,6 +79,9 @@ public class LabMasterService {
         }
         if (location == null || location.isBlank()) {
             throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
+        if (labRepository.existsByLabName(labName)) {
+            throw new CustomException(ErrorCode.DUPLICATE_LAB_NAME);
         }
         if (labRepository.existsByLocation(location)) {
             throw new CustomException(ErrorCode.INVALID_INPUT);

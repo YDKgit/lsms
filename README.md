@@ -1,4 +1,38 @@
-# LSMS
+# LSMS — 연구실 안전 관리 시스템
+
+## 실행 방법
+
+### 사전 준비
+- Java 17+
+- Node.js 18+
+- MySQL 8.0+
+
+### 1. DB 세팅 (MySQL에서 최초 1회)
+```sql
+CREATE DATABASE lsms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 2. 백엔드
+1. `src/main/resources/application.yml` 열어서 `password`를 **본인 MySQL 비밀번호**로 변경
+2. Mac/Linux 최초 1회: `chmod +x gradlew`
+3. 실행:
+   - Mac/Linux: `./gradlew bootRun`
+   - Windows: `gradlew.bat bootRun`
+
+> ⚠️ `ddl-auto: create` 설정으로 **서버 재시작 시 데이터가 초기화**됩니다.
+
+### 3. 프론트엔드 (백엔드 먼저 실행 후)
+```bash
+npm install
+npm run dev
+```
+
+### 초기 로그인 계정
+| ID | PW | 역할 |
+|----|-----|------|
+| admin | 1 | 시스템 관리자 |
+
+---
 
 ## 1. 공통 규칙
 

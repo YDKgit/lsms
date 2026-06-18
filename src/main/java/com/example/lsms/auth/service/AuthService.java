@@ -21,7 +21,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public AuthDto.LoginResponse login(AuthDto.LoginRequest request) {
-        User user = userRepository.findById(request.userId())
+        User user = userRepository.findByUserId(request.userId())
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
@@ -29,7 +29,13 @@ public class AuthService {
         }
 
         String token = jwtUtil.generateToken(user.getId(), user.getRole().name());
-        return new AuthDto.LoginResponse(token, user.getId(), user.getRole());
+        return new AuthDto.LoginResponse(
+                token,
+                user.getId(),
+                user.getUserId(),
+                user.getName(),
+                user.getRole()
+        );
     }
 
     public AuthDto.LogoutResponse logout() {

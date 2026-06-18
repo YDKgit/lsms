@@ -7,6 +7,7 @@ import com.example.lsms.lab.dto.LabResponseDTO;
 import com.example.lsms.lab.service.LabEquipmentService;
 import com.example.lsms.lab.service.LabLayoutService;
 import com.example.lsms.lab.service.LabMasterService;
+import com.example.lsms.lab.service.LabRegistrationFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ public class LabController {
     private final LabMasterService labMasterService;
     private final LabEquipmentService labEquipmentService;
     private final LabLayoutService labLayoutService;
+    private final LabRegistrationFacade labRegistrationFacade;
 
     @GetMapping("/form")
     @PreAuthorize("hasAnyRole('SYSTEM_ADMIN','LAB_MANAGER','LAB_SAFETY_MANAGER','RESEARCHER')")
@@ -86,6 +88,17 @@ public class LabController {
         return CommonResponse.ok(new LabResponseDTO.FloorPlanUploaded(filePath));
     }
 
+    @PostMapping("/{labId}/layout/plan")
+    @PreAuthorize("hasAnyRole('SYSTEM_ADMIN','LAB_MANAGER')")
+    public CommonResponse<LabResponseDTO.LayoutPlanUploaded> uploadLayoutPlan(
+            @PathVariable Long labId,
+            @RequestPart MultipartFile file
+    ) {
+        LabInfo lab = labMasterService.getLabMasterInfo(labId);
+        String filePath = labLayoutService.processLayoutPlanFile(lab, file);
+        return CommonResponse.ok(new LabResponseDTO.LayoutPlanUploaded(filePath));
+    }
+
     @PutMapping("/{labId}/layout")
     @PreAuthorize("hasAnyRole('SYSTEM_ADMIN','LAB_MANAGER')")
     public CommonResponse<String> saveCanvasLayout(
@@ -102,28 +115,10 @@ public class LabController {
     public CommonResponse<LabResponseDTO> registerLabInfo(
             @Valid @RequestBody LabRequestDTO request
     ) {
-        LabResponseDTO.Created created = labMasterService.createLabMaster(request.toMasterCreate());
-
-        LabInfo lab = labMasterService.getLabMasterInfo(created.labId());
-        labEquipmentService.batchInsertEquipments(lab, request.equipList());
-
-        if (request.floorPlan() != null && request.floorPlan().filePath() != null) {
-            labLayoutService.insertFloorPlan(
-                    lab,
-                    request.floorPlan().buildingName(),
-                    request.floorPlan().floorLevel(),
-                    request.floorPlan().filePath()
-            );
-        }
-        if (request.layout() != null) {
-            labLayoutService.insertLayout(
-                    lab,
-                    request.layout().filePath(),
-                    request.layout().layoutData()
-            );
-        }
+        LabResponseDTO.Created created = labRegistrationFacade.registerLabInfo(request);
 
         Long labId = created.labId();
+        LabInfo lab = labMasterService.getLabMasterInfo(labId);
         List<LabResponseDTO.Equip> equipments = labEquipmentService.getEquipmentsByLabId(labId);
         LabRequestDTO.FloorPlan floorPlan = labLayoutService.getCombinedLabDetailsFloor(labId);
         LabRequestDTO.Layout layout = labLayoutService.getCombinedLabDetailsLayout(labId);
@@ -137,7 +132,7 @@ public class LabController {
             LabRequestDTO.Layout layout
     ) {
         String managerName = lab.getManager() != null ? lab.getManager().getName() : null;
-        String deptName = lab.getDeptId() != null ? String.valueOf(lab.getDeptId()) : null;
+        String managerDepartment = lab.getManager() != null ? lab.getManager().getDepartment() : null;
         String floorPlanUrl = floorPlan != null ? floorPlan.filePath() : null;
         String layoutUrl = layout != null ? layout.filePath() : null;
         String layoutData = layout != null ? layout.layoutData() : null;
@@ -145,8 +140,9 @@ public class LabController {
         return new LabResponseDTO(
                 lab.getLabId(),
                 lab.getLabName(),
-                deptName,
+                null,
                 managerName,
+                managerDepartment,
                 lab.getLocation(),
                 lab.getLabType(),
                 lab.getIsInspectionTarget(),

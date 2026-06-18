@@ -21,9 +21,6 @@ public class LabInfo {
     @Column(name = "lab_id", nullable = false)
     private Long labId;
 
-    @Column(name = "dept_id")
-    private Long deptId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
     private User manager;

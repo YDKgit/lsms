@@ -13,10 +13,16 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "리소스를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류입니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다."),
+    FILE_STORAGE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 저장소 생성에 실패했습니다."),
+    INVALID_FILE_PATH(HttpStatus.BAD_REQUEST, "잘못된 파일 경로입니다."),
+    FILE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "파일 생성에 실패했습니다."),
 
     // 서브시스템별 조회 실패 (404 통일)
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 사용자가 없습니다."),
+    USER_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
     LAB_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 연구실이 없습니다."),
+    DUPLICATE_LAB_NAME(HttpStatus.CONFLICT, "이미 사용 중인 연구실 이름입니다."),
     CHEMICAL_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 화학물질이 없습니다."),
     WASTE_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 폐기물이 없습니다."),
     WASTE_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "등록된 폐기물 종류가 없습니다."),

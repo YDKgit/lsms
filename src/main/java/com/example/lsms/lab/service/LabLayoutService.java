@@ -29,6 +29,14 @@ public class LabLayoutService {
     }
 
     @Transactional
+    public String processLayoutPlanFile(LabInfo lab, MultipartFile layoutPlanFile) {
+        if (layoutPlanFile == null || layoutPlanFile.isEmpty()) {
+            return null;
+        }
+        return drawingConverter.storeLayoutPlan(layoutPlanFile, lab.getLabId());
+    }
+
+    @Transactional
     public void insertFloorPlan(LabInfo lab, String buildingName, Integer floorLevel, String filePath) {
         floorPlanRepository.save(FloorPlan.builder()
                 .lab(lab)
