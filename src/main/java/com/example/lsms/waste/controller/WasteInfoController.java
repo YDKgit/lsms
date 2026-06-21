@@ -5,18 +5,15 @@ import com.example.lsms.waste.dto.WasteCreateRequest;
 import com.example.lsms.waste.dto.WasteResponse;
 import com.example.lsms.waste.dto.WasteSearchRequest;
 import com.example.lsms.waste.dto.WasteTypeResponse;
-import com.example.lsms.waste.dto.WasteUpdateRequest;
 import com.example.lsms.waste.service.WasteInfoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,19 +62,5 @@ public class WasteInfoController {
     @GetMapping("/types")
     public CommonResponse<List<WasteTypeResponse>> getWasteTypes() {
         return CommonResponse.ok(wasteInfoService.getWasteTypes());
-    }
-
-    @PutMapping("/{wasteId}")
-    public CommonResponse<WasteResponse> updateWaste(
-            @PathVariable Long wasteId,
-            @Valid @RequestBody WasteUpdateRequest request
-    ) {
-        return CommonResponse.ok(wasteInfoService.updateWaste(wasteId, request));
-    }
-
-    @DeleteMapping("/{wasteId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteWaste(@PathVariable Long wasteId) {
-        wasteInfoService.deleteWaste(wasteId);
     }
 }

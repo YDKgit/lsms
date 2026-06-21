@@ -43,5 +43,8 @@ src/main/resources/static/
 # 문서 (로컬용)
 docs/
 
+# 로컬 MySQL 비밀번호 (팀원 각자 설정)
+src/main/resources/application-local.yml
+
 # macOS
 .DS_Store

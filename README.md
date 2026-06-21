@@ -5,32 +5,55 @@
 ### 사전 준비
 - Java 17+
 - Node.js 18+
-- MySQL 8.0+
+- MySQL 8.0+ (로컬 실행 중)
 
 ### 1. DB 세팅 (MySQL에서 최초 1회)
 ```sql
 CREATE DATABASE lsms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-### 2. 백엔드
-1. `src/main/resources/application.yml` 열어서 `password`를 **본인 MySQL 비밀번호**로 변경
-2. Mac/Linux 최초 1회: `chmod +x gradlew`
-3. 실행:
-   - Mac/Linux: `./gradlew bootRun`
-   - Windows: `gradlew.bat bootRun`
+### 2. MySQL 비밀번호 설정 (팀원 각자 1회)
+```bash
+cp src/main/resources/application-local.yml.example src/main/resources/application-local.yml
+```
+`application-local.yml`을 열어 `password`에 **본인 MySQL root 비밀번호**를 입력합니다.
 
-> ⚠️ `ddl-auto: create` 설정으로 **서버 재시작 시 데이터가 초기화**됩니다.
+> `application-local.yml`은 `.gitignore` 대상입니다. 비밀번호를 커밋하지 마세요.
 
-### 3. 프론트엔드 (백엔드 먼저 실행 후)
+### 3. 백엔드 실행
+Mac/Linux 최초 1회: `chmod +x gradlew`
+
+```bash
+./gradlew bootRun        # Mac/Linux
+gradlew.bat bootRun      # Windows
+```
+
+- 포트: **http://localhost:8080**
+- Swagger: **http://localhost:8080/swagger-ui.html**
+- 서버 기동 시 `DevDataInitializer`가 **테스트 데이터를 자동 삽입**합니다.
+
+> ⚠️ `ddl-auto: create` 설정으로 **서버 재시작 시 DB 스키마·데이터가 초기화**됩니다.
+
+### 4. 프론트엔드 (별도 저장소 — 백엔드 먼저 실행 후)
+프론트 저장소: [lsms-frontend](https://github.com/YDKgit/lsms-frontend)
+
 ```bash
 npm install
 npm run dev
 ```
 
-### 초기 로그인 계정
-| ID | PW | 역할 |
-|----|-----|------|
-| admin | 1 | 시스템 관리자 |
+- 포트: **http://localhost:5173**
+- API 주소 기본값: `http://localhost:8080`
+
+### 초기 로그인 계정 (비밀번호 모두 `1`)
+| ID | 역할 |
+|----|------|
+| admin | 시스템 관리자 |
+| labmanager | 연구실 책임자 |
+| safety | 안전관리팀 |
+| labsafety | 연구실 안전관리자 |
+| edumgr | 교육 관리자 |
+| researcher | 연구원 |
 
 ---
 
@@ -183,8 +206,7 @@ userRepository.save(user);
 - 공통 권한 enum (`UserRole`)
 - 공통 URL 규칙 (`/api/{domain}`)
 
-H2 데이터베이스 ddl-auto=create로 자동 생성해서 빠르게 개발
-이후 MySQL로 전환 
+MySQL + `ddl-auto: create`로 스키마 자동 생성, `DevDataInitializer`로 테스트 데이터 자동 삽입
 
 ---
 

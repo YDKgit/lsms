@@ -1,0 +1,8 @@
+# 팀원 로컬 MySQL 비밀번호 설정
+# 1. 이 파일을 application-local.yml 로 복사
+# 2. password 에 본인 MySQL root 비밀번호 입력
+# 3. application-local.yml 은 .gitignore 대상 (커밋하지 않음)
+
+spring:
+  datasource:
+    password: YOUR_MYSQL_PASSWORD
